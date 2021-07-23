@@ -1,11 +1,18 @@
 import argparse
 import unittest
-from pycron.cli import Validate
+
+from pycron.cli import (
+    DAY_OF_MONTH_REGEX,
+    HOUR_REGEX,
+    MINUTE_REGEX,
+    MONTH_REGEX,
+    Validate,
+)
 
 
 class TestMinuteValidation(unittest.TestCase):
     def setUp(self):
-        self.validation = Validate("[0-5]?[0-9]", imax=60, imin=0)
+        self.validation = Validate(MINUTE_REGEX, imax=60, imin=0)
 
     def test_asterisk_validation(self):
         expected = [n for n in range(0, 60)]
@@ -44,7 +51,7 @@ class TestMinuteValidation(unittest.TestCase):
 
 class TestHourValidation(unittest.TestCase):
     def setUp(self):
-        self.validation = Validate("(2[0-3]|1[0-9]|[0-9])", imax=24, imin=0)
+        self.validation = Validate(HOUR_REGEX, imax=24, imin=0)
 
     def test_asterisk_validation(self):
         expected = [n for n in range(0, 24)]
@@ -83,7 +90,7 @@ class TestHourValidation(unittest.TestCase):
 
 class TestDayOfMonthValidation(unittest.TestCase):
     def setUp(self):
-        self.validation = Validate("(3[01]|[12][0-9]|[1-9])", imax=32)
+        self.validation = Validate(DAY_OF_MONTH_REGEX, imax=32)
 
     def test_asterisk_validation(self):
         expected = [n for n in range(1, 32)]
@@ -95,7 +102,9 @@ class TestDayOfMonthValidation(unittest.TestCase):
         self.assertListEqual([23], self.validation("23"))
 
     def test_division_validation(self):
-        self.assertListEqual([3, 6, 9, 12, 15, 18, 21, 24, 27, 30], self.validation("*/3"))
+        self.assertListEqual(
+            [3, 6, 9, 12, 15, 18, 21, 24, 27, 30], self.validation("*/3")
+        )
         self.assertListEqual([8, 16, 24], self.validation("*/8"))
 
     def test_list_validation(self):
@@ -122,7 +131,7 @@ class TestDayOfMonthValidation(unittest.TestCase):
 
 class TestMonthValidation(unittest.TestCase):
     def setUp(self):
-        self.validation = Validate("(1[0-2]|[1-9])", imax=13)
+        self.validation = Validate(MONTH_REGEX, imax=13)
 
     def test_asterisk_validation(self):
         expected = [n for n in range(1, 13)]
@@ -134,7 +143,9 @@ class TestMonthValidation(unittest.TestCase):
         self.assertListEqual([12], self.validation("12"))
 
     def test_division_validation(self):
-        self.assertListEqual([1,2,3,4,5,6,7,8,9,10,11,12], self.validation("*/1"))
+        self.assertListEqual(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], self.validation("*/1")
+        )
         self.assertListEqual([8], self.validation("*/8"))
         self.assertListEqual([3, 6, 9, 12], self.validation("*/3"))
 

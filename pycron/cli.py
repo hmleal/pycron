@@ -1,6 +1,11 @@
 import argparse
 import re
 
+MINUTE_REGEX = "[0-5]?[0-9]"
+HOUR_REGEX = "(2[0-3]|1[0-9]|[0-9])"
+DAY_OF_MONTH_REGEX = "(3[01]|[12][0-9]|[1-9])"
+MONTH_REGEX = "(1[0-2]|[1-9])"
+
 
 class Validate:
     def __init__(self, exp: str, imax: int, imin: int = 1):
@@ -49,20 +54,18 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PyCron - Cronjob make in Python")
     parser.add_argument(
-        "minutes", type=Validate("[0-5]?[0-9]", imax=60, imin=0), help="Help message"
+        "minutes", type=Validate(MINUTE_REGEX, imax=60, imin=0), help="Help message"
     )
     parser.add_argument(
-        "hours", type=Validate("(2[0-3]|1[0-9]|[0-9])", imax=24, imin=0), help="Help message"
+        "hours", type=Validate(HOUR_REGEX, imax=24, imin=0), help="Help message"
     )
     parser.add_argument(
         "day_of_month",
-        type=Validate("(3[01]|[12][0-9]|[1-9])", imax=32),
+        type=Validate(DAY_OF_MONTH_REGEX, imax=32),
         help="Help message",
     )
     parser.add_argument(
-        "month",
-        type=Validate("(1[0-2]|[1-9])", imax=13),
-        help="Help message"
+        "month", type=Validate(MONTH_REGEX, imax=13), help="Help message"
     )
     parser.add_argument("command", type=str, nargs="*", help="Help message")
 
