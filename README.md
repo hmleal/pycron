@@ -10,7 +10,7 @@
 
 There's no extra dependencies
 
-## Running
+## 🏃🏻 Running
 
     python pycron cli.py --help
     python pycron cli.py minute hour day_of_month month command
@@ -22,3 +22,12 @@ Every paramenter accepts the following expressions
     */n -> Every x days/minutes after the begning
     1,2 -> Selection of days/minutes
     1-5 -> Sequence of days/minutes (start-end)
+
+Some terminals like `zsh` try to expand the `*` character if it's your case please don't
+forget to escape it doing this: `\*`
+
+## ⚙️ Testing
+
+Just run the following command from your terminal
+
+    python -m unittest
