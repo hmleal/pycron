@@ -4,6 +4,8 @@
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+<img src="https://raw.githubusercontent.com/hmleal/pycron/master/demo.gif" align="center" />
+
 ## Requirements
 
 * Python (3.9)
