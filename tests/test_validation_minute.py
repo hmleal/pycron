@@ -2,170 +2,144 @@ import argparse
 import unittest
 
 from pycron.cli import (
-    DAY_OF_MONTH_REGEX,
-    HOUR_REGEX,
-    MINUTE_REGEX,
-    MONTH_REGEX,
-    Validate,
+    day_of_month_validation,
+    hour_validation,
+    minute_validation,
+    month_validation,
 )
 
 
 class TestMinuteValidation(unittest.TestCase):
-    def setUp(self):
-        self.validation = Validate(MINUTE_REGEX, imax=60, imin=0)
-
-    def test_asterisk_validation(self):
+    def test_any_parser(self):
         expected = [n for n in range(0, 60)]
-        self.assertListEqual(expected, self.validation("*"))
 
-    def test_number_validation(self):
-        self.assertListEqual([0], self.validation("0"))
-        self.assertListEqual([23], self.validation("23"))
-        self.assertListEqual([59], self.validation("59"))
+        self.assertListEqual(expected, minute_validation("*"))
 
-    def test_division_validation(self):
-        self.assertListEqual([0, 15, 30, 45], self.validation("*/15"))
-        self.assertListEqual([0, 10, 20, 30, 40, 50], self.validation("*/10"))
+    def test_range_integer_validation(self):
+        for n in range(0, 60):
+            self.assertListEqual([n], minute_validation(str(n)))
 
-    def test_list_validation(self):
-        self.assertListEqual([1, 2], self.validation("1,2"))
-        self.assertListEqual([1, 15], self.validation("1,15"))
+    def test_every_x_time_parser(self):
+        self.assertListEqual([0, 15, 30, 45], minute_validation("*/15"))
+        self.assertListEqual([0, 10, 20, 30, 40, 50], minute_validation("*/10"))
 
-    def test_sequence_validation(self):
-        self.assertListEqual([1, 2, 3, 4, 5], self.validation("1-5"))
-        self.assertListEqual([17, 18, 19, 20, 21, 22, 23], self.validation("17-23"))
+    def test_list_of_integers_parser(self):
+        self.assertListEqual([1, 2], minute_validation("1,2"))
+        self.assertListEqual([15, 23], minute_validation("15,23"))
 
-    def test_validation_should_raise_error(self):
+    def test_validation_error_should_raise_error(self):
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("60")
+            minute_validation("60")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("*/60")
+            minute_validation("*/60")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1,60")
+            minute_validation("1,60")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1-60")
+            minute_validation("1-60")
 
 
 class TestHourValidation(unittest.TestCase):
-    def setUp(self):
-        self.validation = Validate(HOUR_REGEX, imax=24, imin=0)
-
-    def test_asterisk_validation(self):
+    def test_any_parser(self):
         expected = [n for n in range(0, 24)]
-        self.assertListEqual(expected, self.validation("*"))
 
-    def test_number_validation(self):
-        self.assertListEqual([0], self.validation("0"))
-        self.assertListEqual([13], self.validation("13"))
-        self.assertListEqual([23], self.validation("23"))
+        self.assertListEqual(expected, hour_validation("*"))
 
-    def test_division_validation(self):
-        self.assertListEqual([0, 4, 8, 12, 16, 20], self.validation("*/4"))
-        self.assertListEqual([0, 8, 16], self.validation("*/8"))
+    def test_range_integer_validation(self):
+        for n in range(0, 24):
+            self.assertListEqual([n], hour_validation(str(n)))
 
-    def test_list_validation(self):
-        self.assertListEqual([1, 11, 8], self.validation("1,11,8"))
-        self.assertListEqual([1, 21, 23], self.validation("1,21,23"))
+    def test_every_x_time_parser(self):
+        self.assertListEqual([0, 4, 8, 12, 16, 20], hour_validation("*/4"))
+        self.assertListEqual([0, 8, 16], hour_validation("*/8"))
 
-    def test_sequence_validation(self):
-        self.assertListEqual([1, 2, 3, 4, 5], self.validation("1-5"))
-        self.assertListEqual([17, 18, 19, 20, 21, 22, 23], self.validation("17-23"))
+    def test_list_of_integers_parser(self):
+        self.assertListEqual([1, 2], hour_validation("1,2"))
+        self.assertListEqual([15, 23], hour_validation("15,23"))
 
-    def test_validation_should_raise_error(self):
+    def test_validation_error_should_raise_error(self):
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("24")
+            hour_validation("24")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("*/24")
+            hour_validation("*/24")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1,3,24")
+            hour_validation("1,24")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1-60")
+            hour_validation("1-24")
 
 
 class TestDayOfMonthValidation(unittest.TestCase):
-    def setUp(self):
-        self.validation = Validate(DAY_OF_MONTH_REGEX, imax=32)
-
-    def test_asterisk_validation(self):
+    def test_any_parser(self):
         expected = [n for n in range(1, 32)]
-        self.assertListEqual(expected, self.validation("*"))
 
-    def test_number_validation(self):
-        self.assertListEqual([1], self.validation("1"))
-        self.assertListEqual([13], self.validation("13"))
-        self.assertListEqual([23], self.validation("23"))
+        self.assertListEqual(expected, day_of_month_validation("*"))
 
-    def test_division_validation(self):
+    def test_range_integer_validation(self):
+        for n in range(1, 32):
+            self.assertListEqual([n], day_of_month_validation(str(n)))
+
+    def test_every_x_time_parser(self):
         self.assertListEqual(
-            [3, 6, 9, 12, 15, 18, 21, 24, 27, 30], self.validation("*/3")
+            [0, 4, 8, 12, 16, 20, 24, 28], day_of_month_validation("*/4")
         )
-        self.assertListEqual([8, 16, 24], self.validation("*/8"))
+        self.assertListEqual([0, 8, 16, 24], day_of_month_validation("*/8"))
 
-    def test_list_validation(self):
-        self.assertListEqual([1, 11, 8], self.validation("1,11,8"))
-        self.assertListEqual([1, 21, 23], self.validation("1,21,23"))
+    def test_list_of_integers_parser(self):
+        self.assertListEqual([1, 2], day_of_month_validation("1,2"))
+        self.assertListEqual([15, 23], day_of_month_validation("15,23"))
 
-    def test_sequence_validation(self):
-        self.assertListEqual([1, 2, 3, 4, 5], self.validation("1-5"))
-        self.assertListEqual([17, 18, 19, 20, 21, 22, 23], self.validation("17-23"))
-
-    def test_validation_should_raise_error(self):
+    def test_validation_error_should_raise_error(self):
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("0")
+            day_of_month_validation("0")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("*/32")
+            day_of_month_validation("32")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1,3,32")
+            day_of_month_validation("*/32")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1-32")
+            day_of_month_validation("1,32")
+
+        with self.assertRaises(argparse.ArgumentTypeError):
+            day_of_month_validation("1-32")
 
 
 class TestMonthValidation(unittest.TestCase):
-    def setUp(self):
-        self.validation = Validate(MONTH_REGEX, imax=13)
-
-    def test_asterisk_validation(self):
+    def test_any_parser(self):
         expected = [n for n in range(1, 13)]
-        self.assertListEqual(expected, self.validation("*"))
 
-    def test_number_validation(self):
-        self.assertListEqual([1], self.validation("1"))
-        self.assertListEqual([7], self.validation("7"))
-        self.assertListEqual([12], self.validation("12"))
+        self.assertListEqual(expected, month_validation("*"))
 
-    def test_division_validation(self):
-        self.assertListEqual(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], self.validation("*/1")
-        )
-        self.assertListEqual([8], self.validation("*/8"))
-        self.assertListEqual([3, 6, 9, 12], self.validation("*/3"))
+    def test_range_integer_validation(self):
+        for n in range(1, 13):
+            self.assertListEqual([n], month_validation(str(n)))
 
-    def test_list_validation(self):
-        self.assertListEqual([1, 7, 9], self.validation("1,7,9"))
-        self.assertListEqual([1, 7, 12], self.validation("1,7,12"))
+    def test_every_x_time_parser(self):
+        self.assertListEqual([0, 4, 8, 12], month_validation("*/4"))
+        self.assertListEqual([0, 8], month_validation("*/8"))
 
-    def test_sequence_validation(self):
-        self.assertListEqual([1, 2, 3, 4, 5], self.validation("1-5"))
-        self.assertListEqual([9, 10, 11, 12], self.validation("9-12"))
+    def test_list_of_integers_parser(self):
+        self.assertListEqual([1, 2], month_validation("1,2"))
+        self.assertListEqual([7, 9], month_validation("7,9"))
 
-    def test_validation_should_raise_error(self):
+    def test_validation_error_should_raise_error(self):
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("0")
+            month_validation("0")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("*/32")
+            month_validation("13")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1,3,32")
+            month_validation("*/13")
 
         with self.assertRaises(argparse.ArgumentTypeError):
-            self.validation("1-32")
+            month_validation("1,13")
+
+        with self.assertRaises(argparse.ArgumentTypeError):
+            month_validation("1-13")

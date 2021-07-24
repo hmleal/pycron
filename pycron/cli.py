@@ -5,69 +5,92 @@ MINUTE_REGEX = "[0-5]?[0-9]"
 HOUR_REGEX = "(2[0-3]|1[0-9]|[0-9])"
 DAY_OF_MONTH_REGEX = "(3[01]|[12][0-9]|[1-9])"
 MONTH_REGEX = "(1[0-2]|[1-9])"
+DAY_OF_WEEK_REGEX = "[0-6]"
 
 
-class Validate:
-    def __init__(self, exp: str, imax: int, imin: int = 1):
-        self.exp = exp
-        self.imin = imin
-        self.imax = imax
+def _base_validation(exp: str, value: str, end: int, start: int = 0):
+    if value == "*":
+        return [n for n in range(start, end)]
 
-    def __call__(self, value: str):
-        if value == "*":
-            return [n for n in range(self.imin, self.imax)]
+    if re.match(f"^{exp}$", value):
+        return [int(value)]
 
-        if re.match(f"^{self.exp}$", value):
-            return [int(value)]
+    if re.match(f"^\*\/{exp}$", value):
+        number = int(value[2:])
+        response = [n for n in range(0, end, number)]
 
-        if re.match(f"^\*\/{self.exp}$", value):
-            number = int(value[2:])
-            response = [n for n in range(0, self.imax, number)]
+        return response
 
-            if self.imin > 0:
-                return response[1:]
+    if re.match(f"^{exp}(,{exp})*$", value):
+        return [int(n) for n in value.split(",")]
 
-            return response
+    if re.match(f"^{exp}(-{exp})$", value):
+        imin, imax = [int(n) for n in value.split("-")]
+        return [n for n in range(imin, imax + 1)]
 
-        if re.match(f"^{self.exp}(,{self.exp})*$", value):
-            return [int(n) for n in value.split(",")]
-
-        if re.match(f"^{self.exp}(-{self.exp})$", value):
-            start, end = [int(n) for n in value.split("-")]
-            return [n for n in range(start, end + 1)]
-
-        raise argparse.ArgumentTypeError(f"Invalid expression: {value}")
+    raise argparse.ArgumentTypeError(f"Invalid expression: {value}")
 
 
-def show(msg: str, numbers: list[int]):
-    print("{0:14}{1}".format(msg, " ".join([str(n) for n in numbers])))
+def minute_validation(value: str):
+    return _base_validation(exp=MINUTE_REGEX, start=0, end=60, value=value)
+
+
+def hour_validation(value: str):
+    return _base_validation(exp=HOUR_REGEX, start=0, end=24, value=value)
+
+
+def day_of_month_validation(value: str):
+    return _base_validation(exp=DAY_OF_MONTH_REGEX, start=1, end=32, value=value)
+
+
+def month_validation(value: str):
+    return _base_validation(exp=MONTH_REGEX, start=1, end=13, value=value)
+
+
+def day_of_week_validation(value: str):
+    return _base_validation(exp=DAY_OF_MONTH_REGEX, start=0, end=7, value=value)
+
+
+def command_validation(value: str):
+    # TODO Just in need some extra validation here
+    return value
+
+
+def validate_cron_string(value):
+    args = value.split(" ", maxsplit=5)
+
+    validators = [
+        minute_validation,
+        hour_validation,
+        day_of_month_validation,
+        month_validation,
+        day_of_week_validation,
+        command_validation,
+    ]
+
+    if len(args) != 6:
+        raise argparse.ArgumentTypeError(f"Invalid string: `{value}`")
+
+    return [func(arg) for arg, func in zip(args, validators)]
+
+
+def show(args: list[int]):
+    arg_names = ["minute", "hour", "day of month", "month", "day of week", "command"]
+
+    for name, values in zip(arg_names, args):
+        if name != "command":
+            print("{0:14}{1}".format(name, " ".join([str(n) for n in values])))
+        else:
+            print("{0:14}{1}".format(name, values))
 
 
 def main(args):
-    show("minute", args.minutes)
-    show("hour", args.hours)
-    show("day of month", args.day_of_month)
-    show("month", args.month)
-    print("{0:14}{1}".format("command", " ".join(args.command)))
+    show(args.cron_string)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PyCron - Cronjob make in Python")
-    parser.add_argument(
-        "minutes", type=Validate(MINUTE_REGEX, imax=60, imin=0), help="Help message"
-    )
-    parser.add_argument(
-        "hours", type=Validate(HOUR_REGEX, imax=24, imin=0), help="Help message"
-    )
-    parser.add_argument(
-        "day_of_month",
-        type=Validate(DAY_OF_MONTH_REGEX, imax=32),
-        help="Help message",
-    )
-    parser.add_argument(
-        "month", type=Validate(MONTH_REGEX, imax=13), help="Help message"
-    )
-    parser.add_argument("command", type=str, nargs="*", help="Help message")
+    parser.add_argument("cron_string", type=validate_cron_string, help="Help message")
 
     args = parser.parse_args()
 
