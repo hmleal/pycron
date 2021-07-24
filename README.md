@@ -2,6 +2,7 @@
 
 > The quick and simple editor for cron schedule expressions
 
+[![Build Status](https://travis-ci.com/hmleal/pycron.svg?branch=master)](https://travis-ci.com/hmleal/pycron)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <img src="https://raw.githubusercontent.com/hmleal/pycron/master/demo.gif" align="center" />
