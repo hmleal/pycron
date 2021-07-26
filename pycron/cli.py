@@ -84,17 +84,17 @@ def show(args: list[int]):
             print("{0:14}{1}".format(name, values))
 
 
-def main(args):
-    show(args.cron_string)
-
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="PyCron - Cronjob make in Python")
     parser.add_argument("cron_string", type=validate_cron_string, help="Help message")
 
     args = parser.parse_args()
 
-    main(args)
+    show(args.cron_string)
+
+
+if __name__ == "__main__":
+    main()
 
 """
 Minutes
