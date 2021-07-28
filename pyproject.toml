@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycron"
-version = "0.1.0"
+version = "1.0"
 description = "The quick and simple editor for cron schedule expressions"
 authors = ["Henrique Leal <hm.leal@hotmail.com>"]
 license = "MIT"

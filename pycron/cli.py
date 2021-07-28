@@ -85,8 +85,9 @@ def show(args: list[int]):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="PyCron - Cronjob make in Python")
+    parser = argparse.ArgumentParser(prog="Pycron", description="PyCron - Cronjob make in Python")
     parser.add_argument("cron_string", type=validate_cron_string, help="Help message")
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 
     args = parser.parse_args()
 
