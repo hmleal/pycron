@@ -12,18 +12,25 @@ def _base_validation(exp: str, value: str, end: int, start: int = 0):
     if value == "*":
         return [n for n in range(start, end)]
 
+    # Integer
     if re.match(f"^{exp}$", value):
         return [int(value)]
 
+    # Every */x
     if re.match(f"^\*\/{exp}$", value):
         number = int(value[2:])
         response = [n for n in range(0, end, number)]
 
+        if start > 0:
+            return response[1:]
+
         return response
 
+    # Sequencial 1,2
     if re.match(f"^{exp}(,{exp})*$", value):
         return [int(n) for n in value.split(",")]
 
+    # From 1-5
     if re.match(f"^{exp}(-{exp})$", value):
         imin, imax = [int(n) for n in value.split("-")]
         return [n for n in range(imin, imax + 1)]
@@ -52,7 +59,7 @@ def day_of_week_validation(value: str):
 
 
 def command_validation(value: str):
-    # TODO Just in need some extra validation here
+    # TODO Just in case we need some extra validation here
     return value
 
 

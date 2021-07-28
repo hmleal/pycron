@@ -85,9 +85,9 @@ class TestDayOfMonthValidation(unittest.TestCase):
 
     def test_every_x_time_parser(self):
         self.assertListEqual(
-            [0, 4, 8, 12, 16, 20, 24, 28], day_of_month_validation("*/4")
+            [4, 8, 12, 16, 20, 24, 28], day_of_month_validation("*/4")
         )
-        self.assertListEqual([0, 8, 16, 24], day_of_month_validation("*/8"))
+        self.assertListEqual([8, 16, 24], day_of_month_validation("*/8"))
 
     def test_list_of_integers_parser(self):
         self.assertListEqual([1, 2], day_of_month_validation("1,2"))
@@ -121,8 +121,8 @@ class TestMonthValidation(unittest.TestCase):
             self.assertListEqual([n], month_validation(str(n)))
 
     def test_every_x_time_parser(self):
-        self.assertListEqual([0, 4, 8, 12], month_validation("*/4"))
-        self.assertListEqual([0, 8], month_validation("*/8"))
+        self.assertListEqual([4, 8, 12], month_validation("*/4"))
+        self.assertListEqual([8], month_validation("*/8"))
 
     def test_list_of_integers_parser(self):
         self.assertListEqual([1, 2], month_validation("1,2"))
